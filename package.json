@@ -1,0 +1,17 @@
+{
+  "author": "gabriel-rausch",
+  "name": "galen-click-n-pick",
+  "version": "0.0.1",
+  "description": "A web-based framework to generate visual test specs for GALEN's automatation testing.",
+  "repository": {},
+  "scripts": {
+    "start": "grunt connect"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-uglify": "latest",
+    "grunt-contrib-connect": "latest"
+  }
+}

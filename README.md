@@ -1,5 +1,5 @@
 # GALEN Click'n Pick #
-For Galen test runner we are assembling a convenient UI-interface approach to generate the test specs.
+A web-based framework to generate *visual test specs* for GALEN's automatation testing.
 This repro is in the very beginning.
 
 # Getting Started
