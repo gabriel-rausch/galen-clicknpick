@@ -1,5 +1,6 @@
-;(function() {
+;(function(window) {
   var self = this;
+  window.gcnp = self;
   self.selected = null;
 
   self.init = function() {
@@ -7,10 +8,10 @@
     for(var i = 0; i < all.length; i++) {
       all[i].addEventListener('mouseover', function(e) {
         if(self.selected !== null) {
-        self.selected.style.outline = 'none';
+        self.selected.removeAttribute('data-gcnpSelected');
         }
         self.selected = e.target;
-        self.selected.style.outline = '2px red solid';
+        self.selected.setAttribute('data-gcnpSelected', '');
       });
       all[i].addEventListener('click', function(e) {
         e.preventDefault();
@@ -38,7 +39,7 @@
 
   self.getSelector = function(target) {
     var tagSelector = target.tagName.toLowerCase();
-    var classSelector = (target.className !== '') ? ('.' + target.className.replace(' ', '.')) : '';
+    var classSelector = (target.className !== '') ? ('.' + target.className.replace(/ /g, '.')) : '';
     return tagSelector + classSelector;
   };
 
@@ -67,4 +68,4 @@
 
   self.init();
 
-})();
+})(window);

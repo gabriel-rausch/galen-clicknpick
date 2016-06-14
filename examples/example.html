@@ -1421,6 +1421,62 @@ requireJS.require(['http://s.uicdn.com/uimag/3.1962.0/assets/potec.core.min.js']
 potec.init('http://s.uicdn.com/uimag/3.1962.0/assets/', true);
 });
 </script>
+<script src="../libs/dat.gui.min.js"></script>
 <script src="../src/galen-clicknpick.js"></script>
+
+<style>
+.dg.main .button, .dg.main button, .dg.main select, .dg.main input, .dg.main textarea {
+  margin: auto;
+  height: auto;
+  font-size: inherit;
+}
+.dg.main * {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+*[data-gcnpSelected] {
+  outline: 2px red solid;
+  box-shadow: 0 0 0 200px rgba(80,0,0,.5) inset;
+}
+</style>
+<script type="text/javascript">
+
+var convertRGBtoArray = function(str) {
+  return str.substring(5, str.length-1).split(', ');
+};
+
+var Preferences = function() {
+  this.current = '';
+  this.insideParent = true;
+  this.background = true;
+  this.bgcolor = '#000000';
+  this.backgroundAmound = 50;
+  this.size = true;
+  this.position = true;
+  this.fontSize = true;
+  this.fontFamily = true;
+};
+
+window.onload = function() {
+  var prefs = new Preferences();
+  var gui = new dat.GUI();
+  gui.add(prefs, 'current').listen();
+  gui.add(prefs, 'insideParent');
+  gui.add(prefs, 'background');
+  gui.addColor(prefs, 'bgcolor').listen();
+  gui.add(prefs, 'backgroundAmound', 0, 100);
+  gui.add(prefs, 'size');
+  gui.add(prefs, 'position');
+  gui.add(prefs, 'fontSize');
+  gui.add(prefs, 'fontFamily');
+
+  setInterval(function() {
+    prefs.current = window.gcnp.getSelector(window.gcnp.selected);
+    prefs.bgcolor = window.gcnp.styleGetBackground(window.gcnp.selected);
+  }, 100)
+};
+
+</script>
 </body>
 </html>
