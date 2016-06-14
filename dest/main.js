@@ -1,129 +1,3 @@
-;(function(window) {
-  var self = this;
-  window.gcnp = self;
-  self.selected = null;
-
-  self.init = function() {
-    var all = document.querySelectorAll('*');
-    for(var i = 0; i < all.length; i++) {
-      all[i].addEventListener('mouseover', function(e) {
-        if(self.selected !== null) {
-        self.selected.removeAttribute('data-gcnpSelected');
-        }
-        self.selected = e.target;
-        self.selected.setAttribute('data-gcnpSelected', '');
-      });
-      all[i].addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.debug(self.createGalenConf(e.target));
-      });
-    }
-  };
-
-  self.createGalenConf = function(target) {
-    var ret = '@objects    \n';
-    ret += '   element       ' + self.getSelector(target) + '\n';
-    ret += '   parent       .' + target.parentElement.className.replace(' ', '.') + '\n';
-    ret += '   \n';
-    ret += '= Element =    \n';
-    ret += '   element:     \n';
-    ret += '      width ~ ' + self.styleGetSize(target).width + ' \n';
-    ret += '      height ~ ' + self.styleGetSize(target).height + ' \n';
-    ret += '      color-scheme > 50% ' + self.styleGetBackground(target) + ' \n';
-    ret += '      css font-family contains ' + self.styleGetFontFamily(target) + ' \n';
-    ret += '      css font-size contains "' + getComputedStyle(target).fontSize + '" \n';
-
-    return ret;
-  };
-
-  self.getSelector = function(target) {
-    var tagSelector = target.tagName.toLowerCase();
-    var classSelector = (target.className !== '') ? ('.' + target.className.replace(/ /g, '.')) : '';
-    return tagSelector + classSelector;
-  };
-
-  self.styleGetFontFamily = function(target) {
-    return '"' + getComputedStyle(target).fontFamily + '"';
-  };
-
-  self.styleGetBackground = function(target) {
-    var element = target;
-    var bg = '';
-    while(bg === '' && element) {
-      if (getComputedStyle(element).backgroundColor !== 'rgba(0, 0, 0, 0)') {
-        bg = getComputedStyle(element).backgroundColor;
-      }
-      element = element.parentElement;
-    }
-    return bg;
-  };
-
-  self.styleGetSize = function(target) {
-    return {
-      width: getComputedStyle(target).width,
-      height: getComputedStyle(target).height
-    };
-  };
-
-  self.init();
-
-})(window);
-
-
-var convertRGBtoArray = function(str) {
-  return str.substring(5, str.length-1).split(', ');
-};
-
-var Preferences = function() {
-  this.current = '';
-  this.insideParent = true;
-  this.background = true;
-  this.bgcolor = '#000000';
-  this.backgroundAmound = 50;
-  this.size = true;
-  this.position = true;
-  this.fontSize = true;
-  this.fontFamily = true;
-};
-
-window.onload = function() {
-  var prefs = new Preferences();
-  var gui = new dat.GUI();
-  gui.add(prefs, 'current').listen();
-  gui.add(prefs, 'insideParent');
-  gui.add(prefs, 'background');
-  gui.addColor(prefs, 'bgcolor').listen();
-  gui.add(prefs, 'backgroundAmound', 0, 100);
-  gui.add(prefs, 'size');
-  gui.add(prefs, 'position');
-  gui.add(prefs, 'fontSize');
-  gui.add(prefs, 'fontFamily');
-
-  setInterval(function() {
-    prefs.current = window.gcnp.getSelector(window.gcnp.selected);
-    prefs.bgcolor = window.gcnp.styleGetBackground(window.gcnp.selected);
-  }, 100)
-};
-
-var style = document.createElement('style');
-style.type = 'text/css';
-style.innerHTML = '.dg.main .button, .dg.main button, .dg.main select, .dg.main input, .dg.main textarea {  \
-  margin: auto; \
-  height: auto; \
-  font-size: inherit; \
-} \
-.dg.main * {  \
-  outline: none !important; \
-  box-shadow: none !important;  \
-} \
-  \
-*[data-gcnpSelected] {  \
-  outline: 2px red solid; \
-  box-shadow: 0 0 0 200px rgba(80,0,0,.5) inset;  \
-}';
-document.getElementsByTagName('head')[0].appendChild(style);
-
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -219,3 +93,127 @@ window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequest
 "block";this.domElement.style.display="block";this.domElement.style.opacity=0;this.domElement.style.webkitTransform="scale(1.1)";this.layout();a.defer(function(){d.backgroundElement.style.opacity=1;d.domElement.style.opacity=1;d.domElement.style.webkitTransform="scale(1)"})};d.prototype.hide=function(){var a=this,c=function(){a.domElement.style.display="none";a.backgroundElement.style.display="none";f.unbind(a.domElement,"webkitTransitionEnd",c);f.unbind(a.domElement,"transitionend",c);f.unbind(a.domElement,
 "oTransitionEnd",c)};f.bind(this.domElement,"webkitTransitionEnd",c);f.bind(this.domElement,"transitionend",c);f.bind(this.domElement,"oTransitionEnd",c);this.backgroundElement.style.opacity=0;this.domElement.style.opacity=0;this.domElement.style.webkitTransform="scale(1.1)"};d.prototype.layout=function(){this.domElement.style.left=window.innerWidth/2-f.getWidth(this.domElement)/2+"px";this.domElement.style.top=window.innerHeight/2-f.getHeight(this.domElement)/2+"px"};return d}(dat.dom.dom,dat.utils.common),
 dat.dom.dom,dat.utils.common);
+
+;(function(window) {
+  var self = this;
+  window.gcnp = self;
+  self.selected = null;
+
+  self.init = function() {
+    var all = document.querySelectorAll('*');
+    for(var i = 0; i < all.length; i++) {
+      all[i].addEventListener('mouseover', function(e) {
+        if(self.selected !== null) {
+        self.selected.removeAttribute('data-gcnpSelected');
+        }
+        self.selected = e.target;
+        self.selected.setAttribute('data-gcnpSelected', '');
+      });
+      all[i].addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.debug(self.createGalenConf(e.target));
+      });
+    }
+  };
+
+  self.createGalenConf = function(target) {
+    var ret = '@objects    \n';
+    ret += '   element       ' + self.getSelector(target) + '\n';
+    ret += '   parent       .' + target.parentElement.className.replace(' ', '.') + '\n';
+    ret += '   \n';
+    ret += '= Element =    \n';
+    ret += '   element:     \n';
+    ret += '      width ~ ' + self.styleGetSize(target).width + ' \n';
+    ret += '      height ~ ' + self.styleGetSize(target).height + ' \n';
+    ret += '      color-scheme > 50% ' + self.styleGetBackground(target) + ' \n';
+    ret += '      css font-family contains ' + self.styleGetFontFamily(target) + ' \n';
+    ret += '      css font-size contains "' + getComputedStyle(target).fontSize + '" \n';
+
+    return ret;
+  };
+
+  self.getSelector = function(target) {
+    var tagSelector = target.tagName.toLowerCase();
+    var classSelector = (target.className !== '') ? ('.' + target.className.replace(/ /g, '.')) : '';
+    return tagSelector + classSelector;
+  };
+
+  self.styleGetFontFamily = function(target) {
+    return '"' + getComputedStyle(target).fontFamily + '"';
+  };
+
+  self.styleGetBackground = function(target) {
+    var element = target;
+    var bg = '';
+    while(bg === '' && element) {
+      if (getComputedStyle(element).backgroundColor !== 'rgba(0, 0, 0, 0)') {
+        bg = getComputedStyle(element).backgroundColor;
+      }
+      element = element.parentElement;
+    }
+    return bg;
+  };
+
+  self.styleGetSize = function(target) {
+    return {
+      width: getComputedStyle(target).width,
+      height: getComputedStyle(target).height
+    };
+  };
+
+  self.init();
+
+})(window);
+
+
+var convertRGBtoArray = function(str) {
+  return str.substring(5, str.length-1).split(', ');
+};
+
+var Preferences = function() {
+  this.current = '';
+  this.insideParent = true;
+  this.background = true;
+  this.bgcolor = '#000000';
+  this.backgroundAmound = 50;
+  this.size = true;
+  this.position = true;
+  this.fontSize = true;
+  this.fontFamily = true;
+};
+
+var prefs = new Preferences();
+var gui = new dat.GUI();
+gui.add(prefs, 'current').listen();
+gui.add(prefs, 'insideParent');
+gui.add(prefs, 'background');
+gui.addColor(prefs, 'bgcolor').listen();
+gui.add(prefs, 'backgroundAmound', 0, 100);
+gui.add(prefs, 'size');
+gui.add(prefs, 'position');
+gui.add(prefs, 'fontSize');
+gui.add(prefs, 'fontFamily');
+
+setInterval(function() {
+  prefs.current = window.gcnp.getSelector(window.gcnp.selected);
+  prefs.bgcolor = window.gcnp.styleGetBackground(window.gcnp.selected);
+}, 100)
+
+var style = document.createElement('style');
+style.type = 'text/css';
+style.innerHTML = '.dg.main .button, .dg.main button, .dg.main select, .dg.main input, .dg.main textarea {  \
+  margin: auto; \
+  height: auto; \
+  font-size: inherit; \
+} \
+.dg.main * {  \
+  outline: none !important; \
+  box-shadow: none !important;  \
+} \
+  \
+*[data-gcnpSelected] {  \
+  outline: 2px red solid; \
+  box-shadow: 0 0 0 200px rgba(80,0,0,.5) inset;  \
+}';
+document.getElementsByTagName('head')[0].appendChild(style);

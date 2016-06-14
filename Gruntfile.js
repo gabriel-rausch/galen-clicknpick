@@ -20,7 +20,7 @@ module.exports = function(grunt) {
     concat: {
       main: {
         files: {
-          'dest/main.js': ['src/*.js', 'libs/*.js']
+          'dest/main.js': ['libs/*.js', 'src/*.js']
         }
       }
     },
