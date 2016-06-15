@@ -2,9 +2,12 @@
   var self = this;
   window.gcnp = self;
   self.selected = null;
+  self.outputSpec = '';
+  self.overlay = null;
 
   self.init = function() {
     var all = document.querySelectorAll('*');
+
     for(var i = 0; i < all.length; i++) {
       all[i].addEventListener('mouseover', function(e) {
         if(self.selected !== null) {
@@ -16,9 +19,13 @@
       all[i].addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.debug(self.createGalenConf(e.target));
+        self.outputSpec = self.createGalenConf(e.target);
+        self.overlay.innerHTML = self.outputSpec.replace(/\n\r?/g, '<br />');;
+        console.debug(self.outputSpec);
       });
     }
+
+    self.createOverlay();
   };
 
   self.createGalenConf = function(target) {
@@ -29,7 +36,9 @@
     ret += '= Element =    \n';
     ret += '   element:     \n';
     ret += '      width ~ ' + self.styleGetSize(target).width + ' \n';
+    ret += '      width ~ ' + self.styleGetSizePercent(target).width + ' of parent/width \n';
     ret += '      height ~ ' + self.styleGetSize(target).height + ' \n';
+    ret += '      height ~ ' + self.styleGetSizePercent(target).height + ' of parent/height \n';
     ret += '      color-scheme > 50% ' + self.styleGetBackground(target) + ' \n';
     ret += '      css font-family contains ' + self.styleGetFontFamily(target) + ' \n';
     ret += '      css font-size contains "' + getComputedStyle(target).fontSize + '" \n';
@@ -65,6 +74,27 @@
       height: getComputedStyle(target).height
     };
   };
+
+  self.styleGetSizePercent = function(target) {
+    var targetSize = self.styleGetSize(target);
+    var parent = target.parentElement
+    var parentSize = {
+      width: getComputedStyle(parent).width,
+      height: getComputedStyle(parent).height
+    }
+    return {
+      width: Math.round(parseInt(targetSize.width) / parseInt(parentSize.width) * 100) + '%',
+      height: Math.round(parseInt(targetSize.height) / parseInt(parentSize.height) * 100) + '%',
+    };
+  };
+
+  self.createOverlay = function() {
+    var overlay = document.createElement('div');
+    overlay.id = 'overlayGcnp';
+    overlay.innerHTML = '<code></code>';
+    document.body.appendChild(overlay);
+    self.overlay = document.querySelector('#overlayGcnp code');
+  }
 
   self.init();
 

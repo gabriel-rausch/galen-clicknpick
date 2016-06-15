@@ -98,9 +98,12 @@ dat.dom.dom,dat.utils.common);
   var self = this;
   window.gcnp = self;
   self.selected = null;
+  self.outputSpec = '';
+  self.overlay = null;
 
   self.init = function() {
     var all = document.querySelectorAll('*');
+
     for(var i = 0; i < all.length; i++) {
       all[i].addEventListener('mouseover', function(e) {
         if(self.selected !== null) {
@@ -112,9 +115,13 @@ dat.dom.dom,dat.utils.common);
       all[i].addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.debug(self.createGalenConf(e.target));
+        self.outputSpec = self.createGalenConf(e.target);
+        self.overlay.innerHTML = self.outputSpec.replace(/\n\r?/g, '<br />');;
+        console.debug(self.outputSpec);
       });
     }
+
+    self.createOverlay();
   };
 
   self.createGalenConf = function(target) {
@@ -125,7 +132,9 @@ dat.dom.dom,dat.utils.common);
     ret += '= Element =    \n';
     ret += '   element:     \n';
     ret += '      width ~ ' + self.styleGetSize(target).width + ' \n';
+    ret += '      width ~ ' + self.styleGetSizePercent(target).width + ' of parent/width \n';
     ret += '      height ~ ' + self.styleGetSize(target).height + ' \n';
+    ret += '      height ~ ' + self.styleGetSizePercent(target).height + ' of parent/height \n';
     ret += '      color-scheme > 50% ' + self.styleGetBackground(target) + ' \n';
     ret += '      css font-family contains ' + self.styleGetFontFamily(target) + ' \n';
     ret += '      css font-size contains "' + getComputedStyle(target).fontSize + '" \n';
@@ -162,6 +171,27 @@ dat.dom.dom,dat.utils.common);
     };
   };
 
+  self.styleGetSizePercent = function(target) {
+    var targetSize = self.styleGetSize(target);
+    var parent = target.parentElement
+    var parentSize = {
+      width: getComputedStyle(parent).width,
+      height: getComputedStyle(parent).height
+    }
+    return {
+      width: Math.round(parseInt(targetSize.width) / parseInt(parentSize.width) * 100) + '%',
+      height: Math.round(parseInt(targetSize.height) / parseInt(parentSize.height) * 100) + '%',
+    };
+  };
+
+  self.createOverlay = function() {
+    var overlay = document.createElement('div');
+    overlay.id = 'overlayGcnp';
+    overlay.innerHTML = '<code></code>';
+    document.body.appendChild(overlay);
+    self.overlay = document.querySelector('#overlayGcnp code');
+  }
+
   self.init();
 
 })(window);
@@ -177,27 +207,43 @@ var Preferences = function() {
   this.background = true;
   this.bgcolor = '#000000';
   this.backgroundAmound = 50;
-  this.size = true;
+  this.width = '';
+  this.height = '';
+  this.widthPercent = '';
+  this.heightPercent = '';
   this.position = true;
   this.fontSize = true;
   this.fontFamily = true;
+  this.showSpecs = function() {
+    window.gcnp.overlay.parentElement.classList.toggle('open');
+  }
 };
 
 var prefs = new Preferences();
 var gui = new dat.GUI();
 gui.add(prefs, 'current').listen();
-gui.add(prefs, 'insideParent');
-gui.add(prefs, 'background');
-gui.addColor(prefs, 'bgcolor').listen();
-gui.add(prefs, 'backgroundAmound', 0, 100);
-gui.add(prefs, 'size');
-gui.add(prefs, 'position');
-gui.add(prefs, 'fontSize');
-gui.add(prefs, 'fontFamily');
+
+var guiRules = gui.addFolder('Rules');
+guiRules.add(prefs, 'insideParent');
+guiRules.add(prefs, 'background');
+guiRules.addColor(prefs, 'bgcolor').listen();
+guiRules.add(prefs, 'backgroundAmound', 0, 100);
+guiRules.add(prefs, 'width').listen();
+guiRules.add(prefs, 'height').listen();
+guiRules.add(prefs, 'widthPercent').listen();
+guiRules.add(prefs, 'heightPercent').listen();
+guiRules.add(prefs, 'position');
+guiRules.add(prefs, 'fontSize');
+guiRules.add(prefs, 'fontFamily');
+gui.add(prefs, 'showSpecs');
 
 setInterval(function() {
   prefs.current = window.gcnp.getSelector(window.gcnp.selected);
   prefs.bgcolor = window.gcnp.styleGetBackground(window.gcnp.selected);
+  prefs.width = window.gcnp.styleGetSize(window.gcnp.selected).width;
+  prefs.height = window.gcnp.styleGetSize(window.gcnp.selected).height;
+  prefs.widthPercent = window.gcnp.styleGetSizePercent(window.gcnp.selected).width;
+  prefs.heightPercent = window.gcnp.styleGetSizePercent(window.gcnp.selected).height;
 }, 100)
 
 var style = document.createElement('style');
@@ -215,5 +261,27 @@ style.innerHTML = '.dg.main .button, .dg.main button, .dg.main select, .dg.main 
 *[data-gcnpSelected] {  \
   outline: 2px red solid; \
   box-shadow: 0 0 0 200px rgba(80,0,0,.5) inset;  \
+}  \
+\
+#overlayGcnp {  \
+  position: fixed;  \
+  bottom: 0;  \
+  left: 0;  \
+  width: 100%;  \
+  height: 0;  \
+  max-height: 300px;  \
+  padding: 0 30px;  \
+  background: rgba(0, 0, 0, 0.9);  \
+  z-index: 99999999999;  \
+  box-sizing: border-box;  \
+  color: white;  \
+  transition: all .2s;  \
+  font-size: 11px;  \
+  line-height: 1.3;  \
+} \
+\
+#overlayGcnp.open {  \
+  height: auto; \
+  padding: 30px;  \
 }';
 document.getElementsByTagName('head')[0].appendChild(style);

@@ -5,6 +5,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.initConfig({
     connect: {
@@ -33,7 +34,16 @@ module.exports = function(grunt) {
           'dest/main.min.js': ['dest/main.js']
         }
       }
-    }
+    },
+    watch: {
+      scripts: {
+        files: ['src/**/*.js', 'libs/**/*.js'],
+        tasks: ['default'],
+        options: {
+          livereload: true
+        },
+      },
+    },
   });
 
   grunt.registerTask('default', ['concat', 'uglify']);
